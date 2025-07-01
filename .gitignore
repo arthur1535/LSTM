@@ -1,0 +1,10 @@
+# Ignorar arquivos temporários, logs e resultados
+*.log
+*.png
+__pycache__/
+*.pyc
+.DS_Store
+.env
+# Resultados
+previsao_lstm.png
+lstm.log
