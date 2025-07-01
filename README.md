@@ -34,9 +34,7 @@ Este projeto utiliza uma rede neural LSTM para prever o preço da ação VIVT3.S
 - **Linha vermelha tracejada:** Previsão do preço para os próximos 12 meses
 - **Linha verde pontilhada:** Data base da última cotação
 
-Exemplo de gráfico gerado:
 
-![Exemplo de Gráfico](previsao_lstm.png)
 
 ## Orientações
 
