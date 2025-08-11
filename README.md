@@ -38,7 +38,11 @@ Este projeto utiliza uma rede neural LSTM para prever o preço da ação VIVT3.S
 
 ## Orientações
 
-- O script exige pelo menos 70 registros diários para treinar o modelo.
+- O número mínimo de registros depende de `look_back` e da divisão entre treino e teste:
+  - Após a divisão (`p` = proporção de treino), cada subconjunto deve conter mais dados do que `look_back`;
+    logo, `int(N*p) > look_back` e `N - int(N*p) > look_back`.
+  - Exemplo com os valores padrão (`look_back = 60` e `p = 0.8`):
+    o menor `N` que satisfaz essas condições é **301 registros**.
 - Se não houver dados suficientes, o script irá avisar e encerrar.
 - O modelo é apenas uma simulação e não deve ser usado para decisões financeiras reais.
 - Para usar com outros ativos, altere o valor da variável `ticker` no início do script.
