@@ -1,15 +1,6 @@
 import numpy as np
-import pandas as pd
-import yfinance as yf
-import matplotlib.pyplot as plt
 import logging
 import os
-from datetime import datetime
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dropout, Dense
-from tensorflow.keras.callbacks import EarlyStopping
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_squared_error
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -22,8 +13,21 @@ def create_sequences(data, look_back):
 
 def main():
     try:
-        logging.basicConfig(filename='lstm.log', level=logging.INFO,
-                            format='%(asctime)s:%(levelname)s:%(message)s')
+        import pandas as pd
+        import yfinance as yf
+        import matplotlib.pyplot as plt
+        from datetime import datetime
+        from tensorflow.keras.models import Sequential
+        from tensorflow.keras.layers import LSTM, Dropout, Dense
+        from tensorflow.keras.callbacks import EarlyStopping
+        from sklearn.preprocessing import MinMaxScaler
+        from sklearn.metrics import mean_squared_error
+
+        logging.basicConfig(
+            filename='lstm.log',
+            level=logging.INFO,
+            format='%(asctime)s:%(levelname)s:%(message)s'
+        )
         ticker = 'VIVT3.SA'
         data_atual = datetime.now().strftime('%Y-%m-%d')
         print(f"Baixando dados históricos para {ticker} de 2023-01-01 até {data_atual}...")
@@ -72,8 +76,15 @@ def main():
         ])
         modelo_lstm.compile(optimizer='adam', loss='mean_squared_error')
         early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-        modelo_lstm.fit(X_train, Y_train, epochs=50, batch_size=32, 
-                        validation_data=(X_test, Y_test), callbacks=[early_stopping], verbose=1)
+        modelo_lstm.fit(
+            X_train,
+            Y_train,
+            epochs=50,
+            batch_size=32,
+            validation_data=(X_test, Y_test),
+            callbacks=[early_stopping],
+            verbose=1
+        )
         logging.info('Treinamento do modelo concluído.')
         pred_test = modelo_lstm.predict(X_test)
         rmse = np.sqrt(mean_squared_error(Y_test, pred_test))
@@ -87,11 +98,11 @@ def main():
         entrada = scaled_data[-look_back:].tolist()
         for _ in range(forecast_steps):
             seq = np.array(entrada[-look_back:]).reshape((1, look_back, 1))
-            predicao = modelo_lstm.predict(seq, verbose=0)[0,0]
+            predicao = modelo_lstm.predict(seq, verbose=0)[0, 0]
             previsoes.append(predicao)
             entrada.append([predicao])
         previsoes = scaler.inverse_transform(np.array(previsoes).reshape(-1, 1))
-        plt.figure(figsize=(12,6))
+        plt.figure(figsize=(12, 6))
         plt.plot(dados.index, dados['Close'], label='Preço Histórico')
         plt.plot(datas_futuras, previsoes, label='Previsão 12 meses', color='red', linestyle='--')
         plt.axvline(x=dados.index[-1], color='green', linestyle=':', label='Data Atual')
@@ -105,13 +116,18 @@ def main():
         preco_projetado = previsoes[-1][0]
         print(f'Preço Projetado em {target_date.date()}: R$ {preco_projetado:.2f}')
         variacao = ((preco_projetado - preco_base) / preco_base) * 100
-        print(f'Variação percentual esperada de {data_base.date()} até {target_date.date()}: {variacao:.2f}%')
+        print(
+            f'Variação percentual esperada de {data_base.date()} até {target_date.date()}: {variacao:.2f}%'
+        )
         logging.info(f'Preço base ({data_base.date()}): R$ {preco_base:.2f}')
         logging.info(f'Preço projetado em {target_date.date()}: R$ {preco_projetado:.2f}')
-        logging.info(f'Variação percentual esperada de {data_base.date()} até {target_date.date()}: {variacao:.2f}%')
+        logging.info(
+            f'Variação percentual esperada de {data_base.date()} até {target_date.date()}: {variacao:.2f}%'
+        )
     except Exception as e:
         logging.error(f'Erro no script: {e}')
         print(f'Ocorreu um erro: {e}')
 
 if __name__ == "__main__":
     main()
+
