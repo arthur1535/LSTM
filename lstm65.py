@@ -25,6 +25,7 @@ def main():
         logging.basicConfig(filename='lstm.log', level=logging.INFO,
                             format='%(asctime)s:%(levelname)s:%(message)s')
         ticker = 'VIVT3.SA'
+        ticker_display = ticker.split('.')[0]
         data_atual = datetime.now().strftime('%Y-%m-%d')
         print(f"Baixando dados históricos para {ticker} de 2023-01-01 até {data_atual}...")
         dados = yf.download(ticker, start='2023-01-01', end=data_atual)
@@ -95,7 +96,7 @@ def main():
         plt.plot(dados.index, dados['Close'], label='Preço Histórico')
         plt.plot(datas_futuras, previsoes, label='Previsão 12 meses', color='red', linestyle='--')
         plt.axvline(x=dados.index[-1], color='green', linestyle=':', label='Data Atual')
-        plt.title(f'Previsão do Preço da Ação VIVA3 - Projeção de 12 meses')
+        plt.title(f'Previsão do Preço da Ação {ticker_display} - Projeção de 12 meses')
         plt.xlabel('Data')
         plt.ylabel('Preço (R$)')
         plt.legend()
