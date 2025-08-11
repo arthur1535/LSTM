@@ -28,6 +28,14 @@ Este projeto utiliza uma rede neural LSTM para prever o preço da ação VIVT3.S
    - Log de execução: `lstm.log`
    - Resultados impressos no terminal
 
+## Testes
+
+Para executar os testes unitários, utilize o [pytest](https://pytest.org):
+
+```sh
+pytest
+```
+
 ## Sobre o gráfico
 
 - **Linha azul:** Preço histórico da ação
