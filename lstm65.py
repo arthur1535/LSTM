@@ -4,6 +4,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import logging
 import os
+import math
 from datetime import datetime
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dropout, Dense
@@ -44,20 +45,27 @@ def main():
             print("Erro: Coluna 'Close' não encontrada nos dados baixados.")
             logging.error("Coluna 'Close' não encontrada nos dados baixados.")
             return
+
+        look_back = 60
+        train_percent = 0.8
+        min_registros = math.ceil((look_back + 1) / train_percent)
+
         data_base = dados.index[-1]
         print(f'Usando último dia disponível como data base: {data_base.date()}')
         preco_base = dados['Close'].loc[data_base]
         print(f'Preço base ({data_base.date()}): R$ {preco_base:.2f}')
-        if len(dados) < 70:
-            print("Erro: Não há dados suficientes para treinar o modelo.")
-            logging.error("Não há dados suficientes para treinar o modelo.")
+        if len(dados) < min_registros:
+            msg = (f"Erro: Dados insuficientes para treinar o modelo. "
+                   f"São necessários pelo menos {min_registros} registros, "
+                   f"mas foram obtidos {len(dados)}.")
+            print(msg)
+            logging.error(msg)
             return
         close_prices = dados['Close'].values.reshape(-1, 1)
         scaler = MinMaxScaler()
         scaled_data = scaler.fit_transform(close_prices)
-        split = int(len(scaled_data) * 0.8)
+        split = int(len(scaled_data) * train_percent)
         train_data, test_data = scaled_data[:split], scaled_data[split:]
-        look_back = 60
         X_train, Y_train = create_sequences(train_data, look_back)
         X_test, Y_test = create_sequences(test_data, look_back)
         X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))
@@ -112,6 +120,5 @@ def main():
     except Exception as e:
         logging.error(f'Erro no script: {e}')
         print(f'Ocorreu um erro: {e}')
-
 if __name__ == "__main__":
     main()
