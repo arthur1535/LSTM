@@ -48,16 +48,19 @@ def main():
         print(f'Usando último dia disponível como data base: {data_base.date()}')
         preco_base = dados['Close'].loc[data_base]
         print(f'Preço base ({data_base.date()}): R$ {preco_base:.2f}')
-        if len(dados) < 70:
-            print("Erro: Não há dados suficientes para treinar o modelo.")
-            logging.error("Não há dados suficientes para treinar o modelo.")
-            return
         close_prices = dados['Close'].values.reshape(-1, 1)
         scaler = MinMaxScaler()
         scaled_data = scaler.fit_transform(close_prices)
         split = int(len(scaled_data) * 0.8)
         train_data, test_data = scaled_data[:split], scaled_data[split:]
         look_back = 60
+        if len(train_data) <= look_back or len(test_data) <= look_back:
+            msg = (
+                "Erro: Não há dados suficientes para criar janelas de treino e teste com o look_back atual."
+            )
+            print(msg)
+            logging.error(msg)
+            return
         X_train, Y_train = create_sequences(train_data, look_back)
         X_test, Y_test = create_sequences(test_data, look_back)
         X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], 1))
@@ -95,7 +98,7 @@ def main():
         plt.plot(dados.index, dados['Close'], label='Preço Histórico')
         plt.plot(datas_futuras, previsoes, label='Previsão 12 meses', color='red', linestyle='--')
         plt.axvline(x=dados.index[-1], color='green', linestyle=':', label='Data Atual')
-        plt.title(f'Previsão do Preço da Ação VIVA3 - Projeção de 12 meses')
+        plt.title(f'Previsão do Preço da Ação {ticker} - Projeção de 12 meses')
         plt.xlabel('Data')
         plt.ylabel('Preço (R$)')
         plt.legend()
